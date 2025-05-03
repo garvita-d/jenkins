@@ -1,36 +1,35 @@
 pipeline {
     agent {
-        // Correct dockerContainer syntax for your Jenkins version
-        dockerContainer {
-            image 'jenkins/agent:latest-py'  // Must match your configured image
-            // Only these options are allowed:
-            // - image (required)
-            // - connector (optional)
-            // - credentialsId (optional)
-            // - dockerHost (optional)
-            // - remoteFs (optional)
-        }
+        // SIMPLEST WORKING SOLUTION - Use direct label assignment
+        label 'docker-agent-alpine'
     }
 
     stages {
-        stage('Build') {
+        stage('Verify Environment') {
             steps {
-                echo "Building on agent: ${env.NODE_NAME}"
-                sh 'python --version'  // Verify environment
-                // Add your build commands here
+                script {
+                    echo "Running on node: ${env.NODE_NAME}"
+                    sh '''
+                        echo "OS information:"
+                        cat /etc/*-release || true
+                        echo "Python version:"
+                        python --version || echo "Python not found"
+                    '''
+                }
             }
         }
-        stage('Test') {
+        stage('Build') {
             steps {
-                echo "Running tests..."
-                // Add test commands here
+                echo "Building your application..."
+                // Add your actual build commands here
+                // Example: sh 'mvn clean package' or sh 'npm install && npm run build'
             }
         }
     }
 
     post {
         always {
-            echo "Pipeline completed on agent: ${env.NODE_NAME}"
+            echo "Pipeline completed on ${env.NODE_NAME}"
         }
     }
 }
