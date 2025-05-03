@@ -1,22 +1,23 @@
 pipeline {
     agent {
-        // Option 1: Use dockerContainer (correct syntax for Docker agents)
+        // Correct dockerContainer syntax for your Jenkins version
         dockerContainer {
-            image 'jenkins/agent:latest-py'  // Matches your configured template
-            label 'docker-agent-alpine'     // The label you want to use
-            args '-v /tmp:/tmp'             // Optional volume mounts
+            image 'jenkins/agent:latest-py'  // Must match your configured image
+            // Only these options are allowed:
+            // - image (required)
+            // - connector (optional)
+            // - credentialsId (optional)
+            // - dockerHost (optional)
+            // - remoteFs (optional)
         }
-
-        // Option 2: Use label directly (if you just want to use the labeled agent)
-        // label 'docker-agent-alpine'
     }
 
     stages {
         stage('Build') {
             steps {
                 echo "Building on agent: ${env.NODE_NAME}"
-                sh 'python --version'  // Verify Python
-                // Add your build steps here
+                sh 'python --version'  // Verify environment
+                // Add your build commands here
             }
         }
         stage('Test') {
